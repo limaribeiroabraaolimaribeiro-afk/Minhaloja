@@ -1,9 +1,9 @@
 {
   "name": "Chiquinho dos Doces",
   "short_name": "Chiquinho",
-  "start_url": ".",
+  "start_url": "./index.html",
   "display": "standalone",
-  "background_color": "#ffffff",
+  "background_color": "#f2f2f2",
   "theme_color": "#4a2c2a",
   "icons": [
     {
