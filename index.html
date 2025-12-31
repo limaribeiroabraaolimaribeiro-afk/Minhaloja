@@ -31,6 +31,12 @@ h1 {
   box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
 
+.produto img {
+  width: 100%;
+  border-radius: 10px;
+  margin-bottom: 10px;
+}
+
 .preco {
   font-weight: bold;
   color: #1b8f3a;
@@ -52,50 +58,66 @@ h1 {
 <body>
 
 <h1>🍨 Chiquinho dos Doces</h1>
-<p class="subtitulo">Todos os mousses por <strong>R$ 15,00</strong></p>
+<p class="subtitulo">Mousses artesanais • Todos por <strong>R$ 15,00</strong></p>
 
-<!-- PRODUTO -->
-<div class="produto">
-<h2>Mousse de Chocolate ao Leite</h2>
-<p class="preco">R$ 15,00</p>
+<script>
+function produtoHTML(nome, imagem, idQtd, idHora) {
+  return `
+  <div class="produto">
+    <img src="imagens/${imagem}" alt="${nome}">
+    <h2>${nome}</h2>
+    <p class="preco">R$ 15,00</p>
 
-<label>Horário:</label><br>
-<input type="time" id="hora-chocolate"><br><br>
+    <label>Horário:</label><br>
+    <input type="time" id="${idHora}"><br><br>
 
-<label>Quantidade:</label><br>
-<input type="number" id="qtd-chocolate" value="1" min="1"><br>
+    <label>Quantidade:</label><br>
+    <input type="number" id="${idQtd}" value="1" min="1"><br>
 
-<button class="botao"
-onclick="comprar('Mousse de Chocolate ao Leite',15,'qtd-chocolate','hora-chocolate')">
-Comprar pelo WhatsApp
-</button>
-</div>
+    <button class="botao"
+      onclick="comprar('${nome}',15,'${idQtd}','${idHora}')">
+      Comprar pelo WhatsApp
+    </button>
+  </div>`;
+}
+</script>
 
-<!-- PRODUTO -->
-<div class="produto">
-<h2>Mousse de Morango</h2>
-<p class="preco">R$ 15,00</p>
+<div id="lista"></div>
 
-<label>Horário:</label><br>
-<input type="time" id="hora-morango"><br><br>
-
-<label>Quantidade:</label><br>
-<input type="number" id="qtd-morango" value="1" min="1"><br>
-
-<button class="botao"
-onclick="comprar('Mousse de Morango',15,'qtd-morango','hora-morango')">
-Comprar pelo WhatsApp
-</button>
-</div>
-
-<!-- PAGAMENTO -->
 <div class="produto">
 <h2>💳 Formas de Pagamento</h2>
 <p><strong>Pix:</strong> 13965602977</p>
-<p>Envie o comprovante pelo WhatsApp</p>
+<p>Envie o comprovante pelo WhatsApp após o pagamento.</p>
+<p><strong>Cartão crédito/débito:</strong> combinado no WhatsApp.</p>
 </div>
 
 <script>
+document.getElementById("lista").innerHTML =
+produtoHTML(
+  "Mousse de Maracujá",
+  "IMG-20251212-WA0012.jpg",
+  "qtd1",
+  "hora1"
+) +
+produtoHTML(
+  "Mousse de Morango",
+  "IMG-20251231-WA0016.jpg",
+  "qtd2",
+  "hora2"
+) +
+produtoHTML(
+  "Mousse de Salada de Frutas",
+  "IMG-20251231-WA0017.jpg",
+  "qtd3",
+  "hora3"
+) +
+produtoHTML(
+  "Mousse de Chocolate Amargo",
+  "IMG-20251231-WA0018.jpg",
+  "qtd4",
+  "hora4"
+);
+
 function comprar(produto, preco, idQtd, idHora) {
   const qtd = document.getElementById(idQtd).value;
   const hora = document.getElementById(idHora).value;
@@ -105,25 +127,26 @@ function comprar(produto, preco, idQtd, idHora) {
     return;
   }
 
-  const total = (preco * qtd).toFixed(2).replace('.', ',');
-
   navigator.geolocation.getCurrentPosition(function(pos) {
     const lat = pos.coords.latitude;
     const lon = pos.coords.longitude;
+    const total = (preco * qtd).toFixed(2).replace('.', ',');
 
     const msg =
-      "Olá! Quero fazer um pedido:%0A%0A" +
-      "🍮 Produto: " + produto + "%0A" +
-      "📦 Quantidade: " + qtd + "%0A" +
-      "💰 Total: R$ " + total + "%0A" +
-      "⏰ Horário: " + hora + "%0A%0A" +
-      "📍 Localização:%0A" +
-      "https://www.google.com/maps?q=" + lat + "," + lon;
+      `Olá! Quero fazer um pedido:\n\n` +
+      `🍮 Produto: ${produto}\n` +
+      `📦 Quantidade: ${qtd}\n` +
+      `💰 Total: R$ ${total}\n` +
+      `⏰ Horário: ${hora}\n\n` +
+      `📍 Localização:\nhttps://www.google.com/maps?q=${lat},${lon}`;
 
-    window.open("https://wa.me/5547992101675?text=" + msg, "_blank");
+    window.open(
+      "https://wa.me/5547992101675?text=" + encodeURIComponent(msg),
+      "_blank"
+    );
   });
 }
 </script>
 
 </body>
-</html> 
+</html>
