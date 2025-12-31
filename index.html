@@ -1,301 +1,129 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>Minha Loja de Mousses</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Chiquinho dos Doces</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-  body {
-    font-family: Arial, sans-serif;
-    background: #f2f2f2;
-    margin: 0;
-    padding: 20px;
-  }
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #f2f2f2;
+  padding: 20px;
+}
 
-  h1 {
-    text-align: center;
-    color: #4a2c2a;
-  }
+h1 {
+  text-align: center;
+  color: #4a2c2a;
+}
 
-  .subtitulo {
-    text-align: center;
-    color: #666;
-    margin-bottom: 30px;
-  }
+.subtitulo {
+  text-align: center;
+  color: #666;
+  margin-bottom: 25px;
+}
 
-  .produto {
-    background: #ffffff;
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
-  }
+.produto {
+  background: #fff;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
 
-  .produto h2 {
-    margin-top: 0;
-    color: #333;
-  }
+.preco {
+  font-weight: bold;
+  color: #1b8f3a;
+}
 
-  .preco {
-    font-size: 18px;
-    font-weight: bold;
-    color: #1b8f3a;
-  }
-
-  .botao {
-    display: inline-block;
-    margin-top: 12px;
-    padding: 14px;
-    background: #25D366;
-    color: white;
-    text-decoration: none;
-    border-radius: 8px;
-    font-weight: bold;
-    text-align: center;
-  }
-
-  .botao:hover {
-    opacity: 0.9;
-  }
-
-  .pagamento {
-    background: #ffffff;
-    padding: 20px;
-    margin-top: 30px;
-    border-radius: 12px;
-  }
-  </style>
+.botao {
+  width: 100%;
+  padding: 14px;
+  background: #25D366;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  margin-top: 10px;
+}
+</style>
 </head>
 
 <body>
 
-<h1>🍨 Chiquinho Dos Doces</h1>
-  <p class="subtitulo">
-  Mousses artesanais • Todos por apenas <strong>R$ 15,00</strong>
-  </p>
+<h1>🍨 Chiquinho dos Doces</h1>
+<p class="subtitulo">Todos os mousses por <strong>R$ 15,00</strong></p>
 
+<!-- PRODUTO -->
 <div class="produto">
-  <h2>Mousse de chocolate ao leite</h2>
-  <p class="preco">R$ 15,00</p>
+<h2>Mousse de Chocolate ao Leite</h2>
+<p class="preco">R$ 15,00</p>
 
-  <label>Horário para entrega/retirada:</label><br>
-<input type="time" id="hora-chocolateaoleite" style="padding:6px; margin-top:5px;"><br><br>
+<label>Horário:</label><br>
+<input type="time" id="hora-chocolate"><br><br>
 
-  <label>Quantidade:</label><br>
-<input type="number" id="qtd-chocolate" value="1" min="1"
-style="width:60px; padding:5px;"><br><br>
+<label>Quantidade:</label><br>
+<input type="number" id="qtd-chocolate" value="1" min="1"><br>
 
-<button 
-  class="botao"
-  onclick="comprarComQuantidadeELocalizacao(
-    'Mousse de Chocolate ao Leite',
-    15,
-    'qtd-chocolateaoleite',
-    'hora-chocolateaoleite'
-  )"
->
-  Comprar pelo WhatsApp
+<button class="botao"
+onclick="comprar('Mousse de Chocolate ao Leite',15,'qtd-chocolate','hora-chocolate')">
+Comprar pelo WhatsApp
 </button>
 </div>
 
-  <div class="produto">
-  <h2>Mousse de salada de frutas</h2>
-  <p class="preco">R$ 15,00</p>
-
-    <label>Horário para entrega/retirada:</label><br>
-<input type="time" id="hora-saladadefrutas" style="padding:6px; margin-top:5px;"><br><br>
-
-  <label>Quantidade:</label><br>
-<input type="number" id="qtd-chocolate" value="1" min="1"
-style="width:60px; padding:5px;"><br><br>
-
-<button 
-  class="botao"
-  onclick="comprarComQuantidadeELocalizacao(
-    'Mousse de salada de frutas',
-    15,
-    'qtd-saladadefrutas',
-    'hora-saladadefrutas'
-  )"
->
-  Comprar pelo WhatsApp
-</button>
-</div>
-
-  <div class="produto">
-  <h2>Mousse de Morango</h2>
-  <p class="preco">R$ 15,00</p>
-
-    <label>Horário para entrega/retirada:</label><br>
-<input type="time" id="hora-morango" style="padding:6px; margin-top:5px;"><br><br>
-
-  <label>Quantidade:</label><br>
-<input type="number" id="qtd-chocolate" value="1" min="1"
-style="width:60px; padding:5px;"><br><br>
-
-<button 
-  class="botao"
-  onclick="comprarComQuantidadeELocalizacao(
-    'Mousse de Chocolate de morango',
-    15,
-    'qtd-morango',
-    'hora-morango'
-  )"
->
-  Comprar pelo WhatsApp
-</button>
-</div>
-
-  <div class="produto">
-  <h2>Mousse de chocolate branco</h2>
-  <p class="preco">R$ 15,00</p>
-
-    <label>Horário para entrega/retirada:</label><br>
-<input type="time" id="hora-chocolatebranco" style="padding:6px; margin-top:5px;"><br><br>
-    
-  <label>Quantidade:</label><br>
-<input type="number" id="qtd-chocolate" value="1" min="1"
-style="width:60px; padding:5px;"><br><br>
-
-<button 
-  class="botao"
-  onclick="comprarComQuantidadeELocalizacao(
-    'Mousse de Chocolate branco',
-    15,
-    'qtd-chocolatebranco',
-    'hora-chocolatebranco'
-  )"
->
-  Comprar pelo WhatsApp
-</button>
-</div>
-
+<!-- PRODUTO -->
 <div class="produto">
-  <h2>Mousse de Maracujá com brigadeiro</h2>
-  <p class="preco">R$ 15,00</p>
+<h2>Mousse de Morango</h2>
+<p class="preco">R$ 15,00</p>
 
-  <label>Horário para entrega/retirada:</label><br>
-<input type="time" id="hora-maracuja" style="padding:6px; margin-top:5px;"><br><br>
+<label>Horário:</label><br>
+<input type="time" id="hora-morango"><br><br>
 
-  <label>Quantidade:</label><br>
-<input type="number" id="qtd-chocolate" value="1" min="1"
-style="width:60px; padding:5px;"><br><br>
+<label>Quantidade:</label><br>
+<input type="number" id="qtd-morango" value="1" min="1"><br>
 
-<button 
-  class="botao"
-  onclick="comprarComQuantidadeELocalizacao(
-    'Mousse de maracujá com brigadeiro',
-    15,
-    'qtd-maracujacombrigadeiro',
-    'hora-maracujacombrigadeiro'
-  )"
->
-  Comprar pelo WhatsApp
+<button class="botao"
+onclick="comprar('Mousse de Morango',15,'qtd-morango','hora-morango')">
+Comprar pelo WhatsApp
 </button>
 </div>
 
+<!-- PAGAMENTO -->
 <div class="produto">
-  <h2>Mousse de limão com chocolate branco</h2>
-  <p class="preco">R$ 15,00</p>
-
-  <label>Horário para entrega/retirada:</label><br>
-<input type="time" id="hora-limao" style="padding:6px; margin-top:5px;"><br><br>
-
-  <label>Quantidade:</label><br>
-<input type="number" id="qtd-chocolate" value="1" min="1"
-style="width:60px; padding:5px;"><br><br>
-
-<button 
-  class="botao"
-  onclick="comprarComQuantidadeELocalizacao(
-    'Mousse de limao com chocolate branco',
-    15,
-    'qtd-limaocomchocolatebranco',
-    'hora-limaocomchocolatebranco'
-  )"
->
-  Comprar pelo WhatsApp
-</button>
+<h2>💳 Formas de Pagamento</h2>
+<p><strong>Pix:</strong> 13965602977</p>
+<p>Envie o comprovante pelo WhatsApp</p>
 </div>
-<div class="pagamento">
-  <h2>💳 Formas de Pagamento</h2>
 
-  <p><strong>Pix:</strong> 13965602977</p>
-  <p>Envie o comprovante pelo WhatsApp após o pagamento.</p>
-
-  <p><strong>Cartão de crédito e débito:</strong></p>
-  <p>Pagamento combinado diretamente no WhatsApp.</p>
-</div>
-</div>
 <script>
-function comprarComQuantidadeElocalizacao(produto, preco, idQtd) {
-  const qtd = document.getElementById(idQtd).value;
-  const total = preco * qtd;
-
-  if (!navigator.geolocation) {
-    alert("Seu celular não suporta localização.");
-    return;
-  }
-
-  navigator.geolocation.getCurrentPosition(function(pos) {
-    const lat = pos.coords.latitude;
-    const lon = pos.coords.longitude;
-
-    const mensagem =
-      "Olá! Quero pedir:%0A" +
-      "Produto: " + produto + "%0A" +
-      "Quantidade: " + qtd + "%0A" +
-      "Total: R$ " + total.toFixed(2).replace('.', ',') + "%0A%0A" +
-      "Minha localização:%0A" +
-      "https://www.google.com/maps?q=" + lat + "," + lon;
-
-    window.open(
-      "https://wa.me/5547992101675?text=" + mensagem,
-      "_blank"
-    );
-  }, function() {
-    alert("Não foi possível obter a localização.");
-  });
-}
-</script>
-  <script>
-function comprarComQuantidadeELocalizacao(produto, preco, idQtd, idHora) {
+function comprar(produto, preco, idQtd, idHora) {
   const qtd = document.getElementById(idQtd).value;
   const hora = document.getElementById(idHora).value;
 
   if (!hora) {
-    alert("Por favor, selecione o horário de entrega ou retirada.");
+    alert("Selecione o horário.");
     return;
   }
 
   const total = (preco * qtd).toFixed(2).replace('.', ',');
 
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function(pos) {
-      const lat = pos.coords.latitude;
-      const lon = pos.coords.longitude;
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    const lat = pos.coords.latitude;
+    const lon = pos.coords.longitude;
 
-      const mensagem =
-        "Olá! Quero fazer um pedido:\n\n" +
-        "🍮 Produto: " + produto + "\n" +
-        "📦 Quantidade: " + qtd + "\n" +
-        "💰 Total: R$ " + total + "\n" +
-        "⏰ Horário: " + hora + "\n\n" +
-        "📍 Minha localização:\n" +
-        "https://www.google.com/maps?q=" + lat + "," + lon;
+    const msg =
+      "Olá! Quero fazer um pedido:%0A%0A" +
+      "🍮 Produto: " + produto + "%0A" +
+      "📦 Quantidade: " + qtd + "%0A" +
+      "💰 Total: R$ " + total + "%0A" +
+      "⏰ Horário: " + hora + "%0A%0A" +
+      "📍 Localização:%0A" +
+      "https://www.google.com/maps?q=" + lat + "," + lon;
 
-      window.open(
-        "https://wa.me/5547992101675?text=" + encodeURIComponent(mensagem),
-        "_blank"
-      );
-    }, function() {
-      alert("Não foi possível obter a localização.");
-    });
-  } else {
-    alert("Seu celular não suporta localização.");
-  }
+    window.open("https://wa.me/5547992101675?text=" + msg, "_blank");
+  });
 }
-  </script>
+</script>
+
 </body>
-</html>
+</html> 
