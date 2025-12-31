@@ -6,39 +6,78 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      padding: 20px;
-    }
-    h1 {
-      text-align: center;
-    }
-    .produto {
-      background: #fff;
-      padding: 15px;
-      margin: 15px 0;
-      border-radius: 8px;
-    }
-    .botao {
-      display: inline-block;
-      background: green;
-      color: white;
-      padding: 10px;
-      border-radius: 5px;
-      text-decoration: none;
-      margin-top: 10px;
-    }
+  body {
+    font-family: Arial, sans-serif;
+    background: #f2f2f2;
+    margin: 0;
+    padding: 20px;
+  }
+
+  h1 {
+    text-align: center;
+    color: #4a2c2a;
+  }
+
+  .subtitulo {
+    text-align: center;
+    color: #666;
+    margin-bottom: 30px;
+  }
+
+  .produto {
+    background: #ffffff;
+    padding: 20px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  }
+
+  .produto h2 {
+    margin-top: 0;
+    color: #333;
+  }
+
+  .preco {
+    font-size: 18px;
+    font-weight: bold;
+    color: #1b8f3a;
+  }
+
+  .botao {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 14px;
+    background: #25D366;
+    color: white;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: bold;
+    text-align: center;
+  }
+
+  .botao:hover {
+    opacity: 0.9;
+  }
+
+  .pagamento {
+    background: #ffffff;
+    padding: 20px;
+    margin-top: 30px;
+    border-radius: 12px;
+  }
   </style>
 </head>
 
 <body>
 
-<h1>🍨 Minha Loja de Mousses</h1>
+<h1>🍨 Chiquinho Dos Doces</h1>
+  <p class="subtitulo">
+  Mousses artesanais • Todos por apenas <strong>R$ 15,00</strong>
+  </p>
 
 <div class="produto">
   <h2>Mousse de chocolate ao leite</h2>
-  <p>Preço: R$ 15,00</p>
+  <p class="preco">R$ 15,00</p>
 
   <button class="botao"
     onclick="comprarComLocalizacao('Mousse de Maracujá')">
@@ -48,7 +87,7 @@
 
   <div class="produto">
   <h2>Mousse de salada de frutas</h2>
-  <p>Preço: R$ 15,00</p>
+  <p class="preco">R$ 15,00</p>
 
   <button class="botao"
     onclick="comprarComLocalizacao('Mousse de Maracujá')">
@@ -58,7 +97,7 @@
 
   <div class="produto">
   <h2>Mousse de Morango</h2>
-  <p>Preço: R$ 15,00</p>
+  <p class="preco">R$ 15,00</p>
 
   <button class="botao"
     onclick="comprarComLocalizacao('Mousse de Maracujá')">
@@ -68,8 +107,8 @@
 
   <div class="produto">
   <h2>Mousse de chocolate branco</h2>
-  <p>Preço: R$ 15,00</p>
-
+  <p class="preco">R$ 15,00</p>
+    
   <button class="botao"
     onclick="comprarComLocalizacao('Mousse de Maracujá')">
     Comprar pelo WhatsApp
@@ -78,7 +117,7 @@
 
 <div class="produto">
   <h2>Mousse de Maracujá com brigadeiro</h2>
-  <p>Preço: R$ 15,00</p>
+  <p class="preco">R$ 15,00</p>
 
   <button class="botao"
     onclick="comprarComLocalizacao('Mousse de Maracujá')">
@@ -88,14 +127,14 @@
 
 <div class="produto">
   <h2>Mousse de limão com chocolate branco</h2>
-  <p>Preço: R$ 15,00</p>
+  <p class="preco">R$ 15,00</p>
 
   <button class="botao"
     onclick="comprarComLocalizacao('Mousse de Maracujá')">
     Comprar pelo WhatsApp
   </button>
 </div>
-<div style="background:#fff; padding:20px; margin:20px 0; border-radius:10px;">
+<div class="pagamento">
   <h2>💳 Formas de Pagamento</h2>
 
   <p><strong>Pix:</strong> 13965602977</p>
