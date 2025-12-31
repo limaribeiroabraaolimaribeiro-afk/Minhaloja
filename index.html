@@ -90,6 +90,11 @@ function produtoHTML(nome, imagem, idQtd, idHora) {
 <p>Envie o comprovante pelo WhatsApp após o pagamento.</p>
 <p><strong>Cartão crédito/débito:</strong> combinado no WhatsApp.</p>
 </div>
+  
+  <button class="botao"
+onclick="confirmarPagamento()">
+✅ Já paguei – confirmar pedido
+  </button>
 
 <script>
 document.getElementById("lista").innerHTML =
@@ -147,6 +152,18 @@ function comprar(produto, preco, idQtd, idHora) {
   });
 }
 </script>
+  <script>
+function confirmarPagamento() {
+  const msg =
+    "Olá! Já realizei o pagamento do meu pedido ✅\n\n" +
+    "Estou enviando o comprovante agora.";
+
+  window.open(
+    "https://wa.me/5547992101675?text=" + encodeURIComponent(msg),
+    "_blank"
+  );
+}
+  </script>
 
 </body>
 </html>
