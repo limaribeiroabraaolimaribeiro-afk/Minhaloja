@@ -86,9 +86,16 @@
 <input type="number" id="qtd-chocolate" value="1" min="1"
 style="width:60px; padding:5px;"><br><br>
 
-<button class="botao"
-onclick="comprarComQuantidadeElocalizacao('Mousse de Chocolate ao leite', 15, 'qtd-chocolate')">
-Comprar pelo WhatsApp
+<button 
+  class="botao"
+  onclick="comprarComQuantidadeELocalizacao(
+    'Mousse de Chocolate ao Leite',
+    15,
+    'qtd-chocolate',
+    'hora-chocolate'
+  )"
+>
+  Comprar pelo WhatsApp
 </button>
 </div>
 
@@ -103,9 +110,16 @@ Comprar pelo WhatsApp
 <input type="number" id="qtd-chocolate" value="1" min="1"
 style="width:60px; padding:5px;"><br><br>
 
-<button class="botao"
-onclick="comprarComQuantidadeElocalizacao('Mousse de salada de frutas', 15, 'qtd-chocolate')">
-Comprar pelo WhatsApp
+<button 
+  class="botao"
+  onclick="comprarComQuantidadeELocalizacao(
+    'Mousse de Chocolate ao Leite',
+    15,
+    'qtd-chocolate',
+    'hora-chocolate'
+  )"
+>
+  Comprar pelo WhatsApp
 </button>
 </div>
 
@@ -120,9 +134,16 @@ Comprar pelo WhatsApp
 <input type="number" id="qtd-chocolate" value="1" min="1"
 style="width:60px; padding:5px;"><br><br>
 
-<button class="botao"
-onclick="comprarComQuantidadeElocalizacao('Mousse de morango', 15, 'qtd-chocolate')">
-Comprar pelo WhatsApp
+<button 
+  class="botao"
+  onclick="comprarComQuantidadeELocalizacao(
+    'Mousse de Chocolate ao Leite',
+    15,
+    'qtd-chocolate',
+    'hora-chocolate'
+  )"
+>
+  Comprar pelo WhatsApp
 </button>
 </div>
 
@@ -137,9 +158,16 @@ Comprar pelo WhatsApp
 <input type="number" id="qtd-chocolate" value="1" min="1"
 style="width:60px; padding:5px;"><br><br>
 
-<button class="botao"
-onclick="comprarComQuantidadeElocalizacao('Mousse de Chocolate branco', 15, 'qtd-chocolate')">
-Comprar pelo WhatsApp
+<button 
+  class="botao"
+  onclick="comprarComQuantidadeELocalizacao(
+    'Mousse de Chocolate ao Leite',
+    15,
+    'qtd-chocolate',
+    'hora-chocolate'
+  )"
+>
+  Comprar pelo WhatsApp
 </button>
 </div>
 
@@ -154,9 +182,16 @@ Comprar pelo WhatsApp
 <input type="number" id="qtd-chocolate" value="1" min="1"
 style="width:60px; padding:5px;"><br><br>
 
-<button class="botao"
-onclick="comprarComQuantidadeElocalizacao('Mousse de maracujá com brigadeiro', 15, 'qtd-chocolate')">
-Comprar pelo WhatsApp
+<button 
+  class="botao"
+  onclick="comprarComQuantidadeELocalizacao(
+    'Mousse de Chocolate ao Leite',
+    15,
+    'qtd-chocolate',
+    'hora-chocolate'
+  )"
+>
+  Comprar pelo WhatsApp
 </button>
 </div>
 
@@ -171,9 +206,16 @@ Comprar pelo WhatsApp
 <input type="number" id="qtd-chocolate" value="1" min="1"
 style="width:60px; padding:5px;"><br><br>
 
-<button class="botao"
-onclick="comprarComQuantidadeElocalizacao('Mousse de limão com chocolate branco', 15, 'qtd-chocolate')">
-Comprar pelo WhatsApp
+<button 
+  class="botao"
+  onclick="comprarComQuantidadeELocalizacao(
+    'Mousse de Chocolate ao Leite',
+    15,
+    'qtd-chocolate',
+    'hora-chocolate'
+  )"
+>
+  Comprar pelo WhatsApp
 </button>
 </div>
 <div class="pagamento">
@@ -218,10 +260,16 @@ function comprarComQuantidadeElocalizacao(produto, preco, idQtd) {
 }
 </script>
   <script>
-function comprarComHorario(produto, preco, qtdId, horaId) {
-  const qtd = document.getElementById(qtdId).value;
-  const hora = document.getElementById(horaId).value || "Não informado";
-  const total = preco * qtd;
+function comprarComQuantidadeELocalizacao(produto, preco, idQtd, idHora) {
+  const qtd = document.getElementById(idQtd).value;
+  const hora = document.getElementById(idHora).value;
+
+  if (!hora) {
+    alert("Por favor, selecione o horário de entrega ou retirada.");
+    return;
+  }
+
+  const total = (preco * qtd).toFixed(2).replace('.', ',');
 
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(function(pos) {
@@ -232,7 +280,7 @@ function comprarComHorario(produto, preco, qtdId, horaId) {
         "Olá! Quero fazer um pedido:\n\n" +
         "🍮 Produto: " + produto + "\n" +
         "📦 Quantidade: " + qtd + "\n" +
-        "💰 Valor total: R$ " + total.toFixed(2) + "\n" +
+        "💰 Total: R$ " + total + "\n" +
         "⏰ Horário: " + hora + "\n\n" +
         "📍 Minha localização:\n" +
         "https://www.google.com/maps?q=" + lat + "," + lon;
@@ -242,7 +290,7 @@ function comprarComHorario(produto, preco, qtdId, horaId) {
         "_blank"
       );
     }, function() {
-      alert("Não foi possível obter sua localização.");
+      alert("Não foi possível obter a localização.");
     });
   } else {
     alert("Seu celular não suporta localização.");
