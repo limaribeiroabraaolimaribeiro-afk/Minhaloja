@@ -5,6 +5,9 @@
 <title>Chiquinho dos Doces</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+  <link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4a2c2a">
+
 <style>
 body {
   font-family: Arial, sans-serif;
@@ -169,6 +172,19 @@ if ("serviceWorker" in navigator) {
   navigator.serviceWorker.register("service-worker.js")
     .then(() => console.log("Service Worker registrado"))
     .catch(err => console.log("Erro no SW", err));
+}
+  </script>
+  <script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('service-worker.js')
+      .then(function (registration) {
+        console.log('Service Worker registrado com sucesso:', registration.scope);
+      })
+      .catch(function (error) {
+        console.log('Falha ao registrar o Service Worker:', error);
+      });
+  });
 }
   </script>
 
