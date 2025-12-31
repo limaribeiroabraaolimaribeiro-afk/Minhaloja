@@ -79,60 +79,84 @@
   <h2>Mousse de chocolate ao leite</h2>
   <p class="preco">R$ 15,00</p>
 
-  <button class="botao"
-    onclick="comprarComLocalizacao('Mousse de Maracujá')">
-    Comprar pelo WhatsApp
-  </button>
+  <label>Quantidade:</label><br>
+<input type="number" id="qtd-chocolate" value="1" min="1"
+style="width:60px; padding:5px;"><br><br>
+
+<button class="botao"
+onclick="comprarComQuantidadeElocalizacao('Mousse de Chocolate ao leite', 15, 'qtd-chocolate')">
+Comprar pelo WhatsApp
+</button>
 </div>
 
   <div class="produto">
   <h2>Mousse de salada de frutas</h2>
   <p class="preco">R$ 15,00</p>
 
-  <button class="botao"
-    onclick="comprarComLocalizacao('Mousse de Maracujá')">
-    Comprar pelo WhatsApp
-  </button>
+  <label>Quantidade:</label><br>
+<input type="number" id="qtd-chocolate" value="1" min="1"
+style="width:60px; padding:5px;"><br><br>
+
+<button class="botao"
+onclick="comprarComQuantidadeElocalizacao('Mousse de salada de frutas', 15, 'qtd-chocolate')">
+Comprar pelo WhatsApp
+</button>
 </div>
 
   <div class="produto">
   <h2>Mousse de Morango</h2>
   <p class="preco">R$ 15,00</p>
 
-  <button class="botao"
-    onclick="comprarComLocalizacao('Mousse de Maracujá')">
-    Comprar pelo WhatsApp
-  </button>
+  <label>Quantidade:</label><br>
+<input type="number" id="qtd-chocolate" value="1" min="1"
+style="width:60px; padding:5px;"><br><br>
+
+<button class="botao"
+onclick="comprarComQuantidadeElocalizacao('Mousse de morango', 15, 'qtd-chocolate')">
+Comprar pelo WhatsApp
+</button>
 </div>
 
   <div class="produto">
   <h2>Mousse de chocolate branco</h2>
   <p class="preco">R$ 15,00</p>
     
-  <button class="botao"
-    onclick="comprarComLocalizacao('Mousse de Maracujá')">
-    Comprar pelo WhatsApp
-  </button>
+  <label>Quantidade:</label><br>
+<input type="number" id="qtd-chocolate" value="1" min="1"
+style="width:60px; padding:5px;"><br><br>
+
+<button class="botao"
+onclick="comprarComQuantidadeElocalizacao('Mousse de Chocolate branco', 15, 'qtd-chocolate')">
+Comprar pelo WhatsApp
+</button>
 </div>
 
 <div class="produto">
   <h2>Mousse de Maracujá com brigadeiro</h2>
   <p class="preco">R$ 15,00</p>
 
-  <button class="botao"
-    onclick="comprarComLocalizacao('Mousse de Maracujá')">
-    Comprar pelo WhatsApp
-  </button>
+  <label>Quantidade:</label><br>
+<input type="number" id="qtd-chocolate" value="1" min="1"
+style="width:60px; padding:5px;"><br><br>
+
+<button class="botao"
+onclick="comprarComQuantidadeElocalizacao('Mousse de maracujá com brigadeiro', 15, 'qtd-chocolate')">
+Comprar pelo WhatsApp
+</button>
 </div>
 
 <div class="produto">
   <h2>Mousse de limão com chocolate branco</h2>
   <p class="preco">R$ 15,00</p>
 
-  <button class="botao"
-    onclick="comprarComLocalizacao('Mousse de Maracujá')">
-    Comprar pelo WhatsApp
-  </button>
+  <label>Quantidade:</label><br>
+<input type="number" id="qtd-chocolate" value="1" min="1"
+style="width:60px; padding:5px;"><br><br>
+
+<button class="botao"
+onclick="comprarComQuantidadeElocalizacao('Mousse de limão com chocolate branco', 15, 'qtd-chocolate')">
+Comprar pelo WhatsApp
+</button>
 </div>
 <div class="pagamento">
   <h2>💳 Formas de Pagamento</h2>
@@ -144,28 +168,36 @@
   <p>Pagamento combinado diretamente no WhatsApp.</p>
 </div>
 </div>
-  <script>
-function comprarComLocalizacao(produto) {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function(pos) {
-      const lat = pos.coords.latitude;
-      const lon = pos.coords.longitude;
+<script>
+function comprarComQuantidadeElocalizacao(produto, preco, idQtd) {
+  const qtd = document.getElementById(idQtd).value;
+  const total = preco * qtd;
 
-      const mensagem = 
-        "Olá! Quero pedir: " + produto +
-        "%0ALocalização: https://www.google.com/maps?q=" + lat + "," + lon;
-
-      window.open(
-        "https://wa.me/5547992101675?text=" + mensagem,
-        "_blank"
-      );
-    }, function() {
-      alert("Não foi possível obter a localização.");
-    });
-  } else {
+  if (!navigator.geolocation) {
     alert("Seu celular não suporta localização.");
+    return;
   }
+
+  navigator.geolocation.getCurrentPosition(function(pos) {
+    const lat = pos.coords.latitude;
+    const lon = pos.coords.longitude;
+
+    const mensagem =
+      "Olá! Quero pedir:%0A" +
+      "Produto: " + produto + "%0A" +
+      "Quantidade: " + qtd + "%0A" +
+      "Total: R$ " + total.toFixed(2).replace('.', ',') + "%0A%0A" +
+      "Minha localização:%0A" +
+      "https://www.google.com/maps?q=" + lat + "," + lon;
+
+    window.open(
+      "https://wa.me/5547992101675?text=" + mensagem,
+      "_blank"
+    );
+  }, function() {
+    alert("Não foi possível obter a localização.");
+  });
 }
-        </script>
+</script>
 </body>
 </html>
