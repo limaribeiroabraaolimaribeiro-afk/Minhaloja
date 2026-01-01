@@ -104,7 +104,7 @@ function produtoHTML(nome, imagem, idQtd, idHora) {
 }
 </script>
 
-<div id="lista"></div>
+<div id="produtos"></div>
 
 <div class="produto">
 <h2>💳 Formas de Pagamento</h2>
@@ -208,6 +208,41 @@ if ('serviceWorker' in navigator) {
   </script>
 <script type="module" src="./firebase.js"></script>
 <script type="module" src="./produtos.js"></script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  // 🔴 MESMO firebaseConfig
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const container = document.getElementById("produtos");
+
+const q = query(
+  collection(db, "produtos"),
+  where("ativo", "==", true),
+  orderBy("ordem")
+);
+
+const snap = await getDocs(q);
+snap.forEach(d => {
+  const p = d.data();
+  container.innerHTML += `
+    <div class="produto">
+      <img src="${p.imagem}">
+      <h2>${p.nome}</h2>
+      <p class="preco">R$ ${p.preco}</p>
+      <button class="botao"
+        onclick="comprar('${p.nome}', ${p.preco})">
+        Comprar no WhatsApp
+      </button>
+    </div>
+  `;
+});
+</script>
 
 </body>
 </html>
