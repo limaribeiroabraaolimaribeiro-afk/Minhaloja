@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Login Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+  <style>
+    body {
+      background: #121212;
+      font-family: Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: white;
+    }
+
+    .box {
+      background: #1f1f1f;
+      padding: 30px;
+      width: 100%;
+      max-width: 380px;
+      border-radius: 10px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      margin-bottom: 15px;
+      border-radius: 6px;
+      border: none;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background: #2ecc71;
+      border: none;
+      color: black;
+      font-size: 18px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="box">
+  <h2>Login Admin</h2>
+
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="senha" placeholder="Senha">
+
+  <button onclick="login()">Entrar</button>
+</div>
+
+<script>
+  // 🔥 CONFIG DO FIREBASE (cole a SUA aqui)
+  const firebaseConfig = {
+    apiKey: "SUA_API_KEY",
+    authDomain: "SEU_PROJETO.firebaseapp.com",
+    projectId: "SEU_PROJETO",
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  function login() {
+    const email = document.getElementById("email").value;
+    const senha = document.getElementById("senha").value;
+
+    auth.signInWithEmailAndPassword(email, senha)
+      .then(() => {
+        window.location.href = "admin.html";
+      })
+      .catch(error => {
+        alert("Erro: " + error.message);
+      });
+  }
+</script>
+
+</body>
+</html>
