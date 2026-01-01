@@ -124,6 +124,83 @@ function excluirProduto(id) {
   }
 }
 </script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { 
+    getFirestore, 
+    collection, 
+    addDoc, 
+    onSnapshot, 
+    deleteDoc, 
+    doc, 
+    updateDoc 
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "SUA_API_KEY",
+    authDomain: "SEU_AUTH_DOMAIN",
+    projectId: "SEU_PROJECT_ID",
+    storageBucket: "SEU_STORAGE",
+    messagingSenderId: "SEU_SENDER_ID",
+    appId: "SEU_APP_ID"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const lista = document.getElementById("listaProdutos");
+
+  // 🔹 LISTAR PRODUTOS EM TEMPO REAL
+  onSnapshot(collection(db, "produtos"), (snapshot) => {
+    lista.innerHTML = "";
+
+    snapshot.forEach((docSnap) => {
+      const p = docSnap.data();
+      const id = docSnap.id;
+
+      lista.innerHTML += `
+        <div class="produto">
+          <img src="${p.imagem}" style="width:150px"><br>
+          <strong>${p.nome}</strong><br>
+          💰 R$ ${p.preco}<br>
+          Status: ${p.ativo ? "Ativo" : "Inativo"}<br><br>
+
+          <button onclick="excluir('${id}')">Excluir</button>
+          <button onclick="ativar('${id}', ${!p.ativo})">
+            ${p.ativo ? "Desativar" : "Ativar"}
+          </button>
+        </div>
+      `;
+    });
+  });
+
+  // 🔹 ADICIONAR PRODUTO
+  window.adicionarProduto = async () => {
+    const nome = document.getElementById("nome").value;
+    const preco = Number(document.getElementById("preco").value);
+    const imagem = document.getElementById("imagem").value;
+
+    await addDoc(collection(db, "produtos"), {
+      nome,
+      preco,
+      imagem,
+      ativo: true,
+      criadoEm: new Date()
+    });
+
+    alert("Produto adicionado!");
+  };
+
+  // 🔹 EXCLUIR
+  window.excluir = async (id) => {
+    await deleteDoc(doc(db, "produtos", id));
+  };
+
+  // 🔹 ATIVAR / DESATIVAR
+  window.ativar = async (id, estado) => {
+    await updateDoc(doc(db, "produtos", id), { ativo: estado });
+  };
+</script>
 
 </body>
 </html>
