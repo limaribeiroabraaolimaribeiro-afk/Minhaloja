@@ -3,53 +3,53 @@
 <head>
 <meta charset="UTF-8">
 <title>Painel Admin</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body {
   font-family: Arial, sans-serif;
-  background: #111;
-  color: #fff;
+  background: #f2f2f2;
   padding: 20px;
 }
-h1 {
-  color: #25D366;
-}
+h1 { text-align: center; }
 input, button {
   width: 100%;
-  padding: 12px;
-  margin-bottom: 10px;
-  border-radius: 6px;
-  border: none;
+  padding: 10px;
+  margin-top: 8px;
 }
 button {
-  background: #25D366;
-  color: #000;
-  font-weight: bold;
+  background: #4CAF50;
+  color: #fff;
+  border: none;
+  font-size: 16px;
+}
+.produto {
+  background: #fff;
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 8px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>🛠 Painel Admin</h1>
+<h1>📦 Painel de Produtos</h1>
 
+<h3>Novo Produto</h3>
 <input id="nome" placeholder="Nome do produto">
 <input id="preco" type="number" placeholder="Preço">
-<input id="imagem" placeholder="Caminho da imagem (ex: imagens/foto.jpg)">
-<input id="ordem" type="number" placeholder="Ordem (1,2,3...)">
+<input id="imagem" placeholder="URL da imagem">
+<button onclick="adicionarProduto()">Adicionar Produto</button>
 
-<button onclick="salvarProduto()">Salvar Produto</button>
-
-<p id="status"></p>
+<h3>Produtos Cadastrados</h3>
+<div id="lista"></div>
 
 <!-- FIREBASE -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-// 🔴 COLE SEU firebaseConfig AQUI
+<script>
 const firebaseConfig = {
   apiKey: "AIzaSyCy-zUh5M2KiXvWGfXL17onsOtpzGZXf8Y",
   authDomain: "chiquinho-admin-248b6.firebaseapp.com",
@@ -59,42 +59,43 @@ const firebaseConfig = {
   appId: "1:177897723264:web:f59f2f0e0f456c9bbd5d65"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-// 🔒 Proteção: só entra logado
-onAuthStateChanged(auth, user => {
-  if (!user) {
-    window.location.href = "login.html";
-  }
-});
-
-window.salvarProduto = async function () {
+function adicionarProduto() {
   const nome = document.getElementById("nome").value;
   const preco = Number(document.getElementById("preco").value);
   const imagem = document.getElementById("imagem").value;
-  const ordem = Number(document.getElementById("ordem").value);
 
-  if (!nome || !preco || !imagem) {
-    alert("Preencha tudo");
-    return;
-  }
-
-  await addDoc(collection(db, "produtos"), {
+  db.collection("produtos").add({
     nome,
     preco,
     imagem,
     ativo: true,
-    ordem
+    criadoEm: new Date()
+  }).then(() => {
+    alert("Produto adicionado!");
+    listarProdutos();
   });
-
-  document.getElementById("status").innerText = "✅ Produto salvo!";
-  document.getElementById("nome").value = "";
-  document.getElementById("preco").value = "";
-  document.getElementById("imagem").value = "";
-  document.getElementById("ordem").value = "";
 }
+
+function listarProdutos() {
+  document.getElementById("lista").innerHTML = "";
+  db.collection("produtos").onSnapshot(snapshot => {
+    snapshot.forEach(doc => {
+      const p = doc.data();
+      document.getElementById("lista").innerHTML += `
+        <div class="produto">
+          <strong>${p.nome}</strong><br>
+          R$ ${p.preco}<br>
+          Ativo: ${p.ativo}
+        </div>
+      `;
+    });
+  });
+}
+
+listarProdutos();
 </script>
 
 </body>
