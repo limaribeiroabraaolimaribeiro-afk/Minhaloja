@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Login Admin</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #111;
+      color: #fff;
+      display: flex;
+      height: 100vh;
+      justify-content: center;
+      align-items: center;
+    }
+    .box {
+      background: #1c1c1c;
+      padding: 30px;
+      border-radius: 10px;
+      width: 100%;
+      max-width: 350px;
+    }
+    input, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+    }
+    button {
+      background: #25D366;
+      border: none;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="box">
+  <h2>Login Admin</h2>
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="senha" placeholder="Senha">
+  <button onclick="login()">Entrar</button>
+</div>
+
+<script>
+  // 🔥 COLE AQUI O SDK DO FIREBASE
+  const firebaseConfig = {
+    // cole exatamente o config que o Firebase te deu
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+
+  function login() {
+    const email = document.getElementById("email").value;
+    const senha = document.getElementById("senha").value;
+
+    auth.signInWithEmailAndPassword(email, senha)
+      .then(() => {
+        window.location.href = "painel.html";
+      })
+      .catch(error => {
+        alert("Erro: " + error.message);
+      });
+  }
+</script>
+
+</body>
+</html>
