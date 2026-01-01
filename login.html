@@ -1,92 +1,30 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Login Admin</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-
-  <style>
-    body {
-      background: #121212;
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      color: white;
-    }
-
-    .box {
-      background: #1f1f1f;
-      padding: 30px;
-      width: 100%;
-      max-width: 380px;
-      border-radius: 10px;
-    }
-
-    input {
-      width: 100%;
-      padding: 14px;
-      margin-bottom: 15px;
-      border-radius: 6px;
-      border: none;
-      font-size: 16px;
-    }
-
-    button {
-      width: 100%;
-      padding: 14px;
-      background: #2ecc71;
-      border: none;
-      color: black;
-      font-size: 18px;
-      border-radius: 6px;
-      cursor: pointer;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Login Admin</title>
 </head>
-
 <body>
 
-<div class="box">
-  <h2>Login Admin</h2>
+<h2>Login Admin</h2>
+<input id="email" placeholder="Email">
+<input id="senha" type="password" placeholder="Senha">
+<button onclick="login()">Entrar</button>
 
-  <input type="email" id="email" placeholder="Email">
-  <input type="password" id="senha" placeholder="Senha">
+<script type="module">
+import { auth, signInWithEmailAndPassword } from "./firebase.js";
 
-  <button onclick="login()">Entrar</button>
-</div>
+window.login = async () => {
+  const email = document.getElementById("email").value;
+  const senha = document.getElementById("senha").value;
 
-<script>
-  // 🔥 CONFIG DO FIREBASE (cole a SUA aqui)
-  const firebaseConfig = {
-  apiKey: "AIzaSyCy-zUh5M2KiXvWGfXL17onsOtpzGZXf8Y",
-  authDomain: "chiquinho-admin-248b6.firebaseapp.com",
-  projectId: "chiquinho-admin-248b6",
-  storageBucket: "chiquinho-admin-248b6.firebasestorage.app",
-  messagingSenderId: "177897723264",
-  appId: "1:177897723264:web:f59f2f0e0f456c9bbd5d65"
-};
-
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
-
-  function login() {
-    const email = document.getElementById("email").value;
-    const senha = document.getElementById("senha").value;
-
-    auth.signInWithEmailAndPassword(email, senha)
-      .then(() => {
-        window.location.href = "admin.html";
-      })
-      .catch(error => {
-        alert("Erro: " + error.message);
-      });
+  try {
+    await signInWithEmailAndPassword(auth, email, senha);
+    window.location.href = "admin.html";
+  } catch (e) {
+    alert("Erro no login");
   }
+};
 </script>
 
 </body>
