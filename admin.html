@@ -43,7 +43,7 @@ button {
 <button onclick="adicionarProduto()">Adicionar Produto</button>
 
 <h3>Produtos Cadastrados</h3>
-<div id="lista"></div>
+<div id="listaProdutos"></div>
 
 <!-- FIREBASE -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
@@ -58,6 +58,51 @@ const firebaseConfig = {
   messagingSenderId: "177897723264",
   appId: "1:177897723264:web:f59f2f0e0f456c9bbd5d65"
 };
+  <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, onSnapshot, deleteDoc, doc, updateDoc } 
+  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const firebaseConfig = {
+    // 🔴 SEU firebaseConfig AQUI
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  const lista = document.getElementById("listaProdutos");
+
+  onSnapshot(collection(db, "produtos"), (snapshot) => {
+    lista.innerHTML = "";
+
+    snapshot.forEach((docSnap) => {
+      const p = docSnap.data();
+      const id = docSnap.id;
+
+      lista.innerHTML += `
+        <div style="border:1px solid #ddd; padding:10px; margin-bottom:10px">
+          <img src="${p.imagem}" style="width:100%; max-width:200px"><br>
+          <strong>${p.nome}</strong><br>
+          💰 R$ ${p.preco}<br>
+          ✅ Ativo: ${p.ativo}<br><br>
+
+          <button onclick="excluir('${id}')">🗑 Excluir</button>
+          <button onclick="ativar('${id}', ${!p.ativo})">
+            ${p.ativo ? "Desativar" : "Ativar"}
+          </button>
+        </div>
+      `;
+    });
+  });
+
+  window.excluir = async (id) => {
+    await deleteDoc(doc(db, "produtos", id));
+  };
+
+  window.ativar = async (id, estado) => {
+    await updateDoc(doc(db, "produtos", id), { ativo: estado });
+  };
+</script>
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
