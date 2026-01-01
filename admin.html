@@ -1,205 +1,94 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html>
 <head>
 <meta charset="UTF-8">
 <title>Painel Admin</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background: #f2f2f2;
-  padding: 20px;
-}
-h1 { text-align: center; }
-input, button {
-  width: 100%;
-  padding: 10px;
-  margin-top: 8px;
-}
-button {
-  background: #4CAF50;
-  color: #fff;
-  border: none;
-  font-size: 16px;
-}
-.produto {
-  background: #fff;
-  padding: 10px;
-  margin-top: 10px;
-  border-radius: 8px;
-}
-.produto img {
-  width: 120px;
-  display: block;
-  margin-bottom: 8px;
-}
+body { font-family: Arial; background:#f2f2f2; padding:15px }
+.card { background:#fff; padding:15px; border-radius:10px; margin-bottom:15px }
+img { width:100px; border-radius:8px }
+button { padding:8px; margin-top:5px }
+.ativo { color:green }
+.inativo { color:red }
 </style>
 </head>
 
 <body>
 
-<h1>📦 Painel de Produtos</h1>
+<h2>📦 Painel de Produtos</h2>
 
+<div class="card">
 <h3>Novo Produto</h3>
-<input id="nome" placeholder="Nome do produto">
-<input id="preco" type="number" placeholder="Preço">
-<input id="imagem" placeholder="URL da imagem">
-<button onclick="adicionarProduto()">Adicionar Produto</button>
+<input id="nome" placeholder="Nome"><br>
+<input id="preco" type="number" placeholder="Preço"><br>
+<input id="imagem" placeholder="URL da imagem"><br>
+<button onclick="add()">➕ Adicionar</button>
+</div>
 
-<h3>Produtos Cadastrados</h3>
-<div id="listaProdutos"></div>
+<div id="lista"></div>
 
-<!-- FIREBASE V8 COMPAT -->
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script type="module">
+import {
+  db,
+  auth,
+  collection,
+  addDoc,
+  onSnapshot,
+  deleteDoc,
+  doc,
+  updateDoc,
+  onAuthStateChanged,
+  query,
+  orderBy
+} from "./firebase.js";
 
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyCy-zUh5M2KiXvWGfXL17onsOtpzGZXf8Y",
-  authDomain: "chiquinho-admin-248b6.firebaseapp.com",
-  projectId: "chiquinho-admin-248b6",
-  storageBucket: "chiquinho-admin-248b6.appspot.com",
-  messagingSenderId: "177897723264",
-  appId: "1:177897723264:web:f59f2f0e0f456c9bbd5d65"
-};
+onAuthStateChanged(auth, user => {
+  if (!user) window.location.href = "login.html";
+});
 
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
+const lista = document.getElementById("lista");
+const q = query(collection(db, "produtos"), orderBy("ordem"));
 
-function adicionarProduto() {
-  const nome = document.getElementById("nome").value;
-  const preco = Number(document.getElementById("preco").value);
-  const imagem = document.getElementById("imagem").value;
-
-  db.collection("produtos").add({
-    nome,
-    preco,
-    imagem,
-    ativo: true,
-    criadoEm: new Date()
-  }).then(() => {
-    alert("Produto adicionado!");
-    document.getElementById("nome").value = "";
-    document.getElementById("preco").value = "";
-    document.getElementById("imagem").value = "";
-  });
-}
-
-db.collection("produtos").orderBy("criadoEm", "desc")
-.onSnapshot(snapshot => {
-  const lista = document.getElementById("listaProdutos");
+onSnapshot(q, snap => {
   lista.innerHTML = "";
-
-  snapshot.forEach(doc => {
-    const p = doc.data();
-    const id = doc.id;
-
+  snap.forEach(d => {
+    const p = d.data();
     lista.innerHTML += `
-      <div class="produto">
-        <img src="${p.imagem}">
+      <div class="card">
+        <img src="${p.imagem}"><br>
         <strong>${p.nome}</strong><br>
-        💰 R$ ${p.preco}<br>
-        ✅ Ativo: ${p.ativo}<br><br>
-
-        <button onclick="ativarProduto('${id}', ${!p.ativo})">
-          ${p.ativo ? "Desativar" : "Ativar"}
+        R$ ${p.preco}<br>
+        <span class="${p.ativo ? 'ativo' : 'inativo'}">
+          ${p.ativo ? 'Ativo' : 'Inativo'}
+        </span><br>
+        <button onclick="toggle('${d.id}', ${!p.ativo})">
+          ${p.ativo ? 'Desativar' : 'Ativar'}
         </button>
-
-        <button onclick="excluirProduto('${id}')" style="background:red">
-          Excluir
-        </button>
+        <button onclick="del('${d.id}')">Excluir</button>
       </div>
     `;
   });
 });
 
-function ativarProduto(id, estado) {
-  db.collection("produtos").doc(id).update({ ativo: estado });
-}
-
-function excluirProduto(id) {
-  if (confirm("Excluir produto?")) {
-    db.collection("produtos").doc(id).delete();
-  }
-}
-</script>
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { 
-    getFirestore, 
-    collection, 
-    addDoc, 
-    onSnapshot, 
-    deleteDoc, 
-    doc, 
-    updateDoc 
-  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-  const firebaseConfig = {
-    apiKey: "SUA_API_KEY",
-    authDomain: "SEU_AUTH_DOMAIN",
-    projectId: "SEU_PROJECT_ID",
-    storageBucket: "SEU_STORAGE",
-    messagingSenderId: "SEU_SENDER_ID",
-    appId: "SEU_APP_ID"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  const lista = document.getElementById("listaProdutos");
-
-  // 🔹 LISTAR PRODUTOS EM TEMPO REAL
-  onSnapshot(collection(db, "produtos"), (snapshot) => {
-    lista.innerHTML = "";
-
-    snapshot.forEach((docSnap) => {
-      const p = docSnap.data();
-      const id = docSnap.id;
-
-      lista.innerHTML += `
-        <div class="produto">
-          <img src="${p.imagem}" style="width:150px"><br>
-          <strong>${p.nome}</strong><br>
-          💰 R$ ${p.preco}<br>
-          Status: ${p.ativo ? "Ativo" : "Inativo"}<br><br>
-
-          <button onclick="excluir('${id}')">Excluir</button>
-          <button onclick="ativar('${id}', ${!p.ativo})">
-            ${p.ativo ? "Desativar" : "Ativar"}
-          </button>
-        </div>
-      `;
-    });
+window.add = async () => {
+  await addDoc(collection(db, "produtos"), {
+    nome: nome.value,
+    preco: Number(preco.value),
+    imagem: imagem.value,
+    ativo: true,
+    ordem: Date.now()
   });
+};
 
-  // 🔹 ADICIONAR PRODUTO
-  window.adicionarProduto = async () => {
-    const nome = document.getElementById("nome").value;
-    const preco = Number(document.getElementById("preco").value);
-    const imagem = document.getElementById("imagem").value;
-
-    await addDoc(collection(db, "produtos"), {
-      nome,
-      preco,
-      imagem,
-      ativo: true,
-      criadoEm: new Date()
-    });
-
-    alert("Produto adicionado!");
-  };
-
-  // 🔹 EXCLUIR
-  window.excluir = async (id) => {
+window.del = async id => {
+  if (confirm("Excluir?"))
     await deleteDoc(doc(db, "produtos", id));
-  };
+};
 
-  // 🔹 ATIVAR / DESATIVAR
-  window.ativar = async (id, estado) => {
-    await updateDoc(doc(db, "produtos", id), { ativo: estado });
-  };
+window.toggle = async (id, estado) => {
+  await updateDoc(doc(db, "produtos", id), { ativo: estado });
+};
 </script>
 
 </body>
