@@ -29,6 +29,11 @@ button {
   margin-top: 10px;
   border-radius: 8px;
 }
+.produto img {
+  width: 120px;
+  display: block;
+  margin-bottom: 8px;
+}
 </style>
 </head>
 
@@ -45,7 +50,7 @@ button {
 <h3>Produtos Cadastrados</h3>
 <div id="listaProdutos"></div>
 
-<!-- FIREBASE -->
+<!-- FIREBASE V8 COMPAT -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
@@ -54,55 +59,10 @@ const firebaseConfig = {
   apiKey: "AIzaSyCy-zUh5M2KiXvWGfXL17onsOtpzGZXf8Y",
   authDomain: "chiquinho-admin-248b6.firebaseapp.com",
   projectId: "chiquinho-admin-248b6",
-  storageBucket: "chiquinho-admin-248b6.firebasestorage.app",
+  storageBucket: "chiquinho-admin-248b6.appspot.com",
   messagingSenderId: "177897723264",
   appId: "1:177897723264:web:f59f2f0e0f456c9bbd5d65"
 };
-  <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getFirestore, collection, onSnapshot, deleteDoc, doc, updateDoc } 
-  from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-  const firebaseConfig = {
-    // 🔴 SEU firebaseConfig AQUI
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-
-  const lista = document.getElementById("listaProdutos");
-
-  onSnapshot(collection(db, "produtos"), (snapshot) => {
-    lista.innerHTML = "";
-
-    snapshot.forEach((docSnap) => {
-      const p = docSnap.data();
-      const id = docSnap.id;
-
-      lista.innerHTML += `
-        <div style="border:1px solid #ddd; padding:10px; margin-bottom:10px">
-          <img src="${p.imagem}" style="width:100%; max-width:200px"><br>
-          <strong>${p.nome}</strong><br>
-          💰 R$ ${p.preco}<br>
-          ✅ Ativo: ${p.ativo}<br><br>
-
-          <button onclick="excluir('${id}')">🗑 Excluir</button>
-          <button onclick="ativar('${id}', ${!p.ativo})">
-            ${p.ativo ? "Desativar" : "Ativar"}
-          </button>
-        </div>
-      `;
-    });
-  });
-
-  window.excluir = async (id) => {
-    await deleteDoc(doc(db, "produtos", id));
-  };
-
-  window.ativar = async (id, estado) => {
-    await updateDoc(doc(db, "produtos", id), { ativo: estado });
-  };
-</script>
 
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
@@ -120,40 +80,42 @@ function adicionarProduto() {
     criadoEm: new Date()
   }).then(() => {
     alert("Produto adicionado!");
-    listarProdutos();
+    document.getElementById("nome").value = "";
+    document.getElementById("preco").value = "";
+    document.getElementById("imagem").value = "";
   });
 }
 
-<script>
-function listarProdutos() {
-  document.getElementById("lista").innerHTML = "";
-  db.collection("produtos").onSnapshot(snapshot => {
-    snapshot.forEach(doc => {
-      const p = doc.data();
-      const id = doc.id;
+db.collection("produtos").orderBy("criadoEm", "desc")
+.onSnapshot(snapshot => {
+  const lista = document.getElementById("listaProdutos");
+  lista.innerHTML = "";
 
-      document.getElementById("lista").innerHTML += `
-        <div class="produto">
-          <strong>${p.nome}</strong><br>
-          R$ ${p.preco}<br>
+  snapshot.forEach(doc => {
+    const p = doc.data();
+    const id = doc.id;
 
-          <button onclick="ativarProduto('${id}', ${!p.ativo})">
-            ${p.ativo ? 'Desativar' : 'Ativar'}
-          </button>
+    lista.innerHTML += `
+      <div class="produto">
+        <img src="${p.imagem}">
+        <strong>${p.nome}</strong><br>
+        💰 R$ ${p.preco}<br>
+        ✅ Ativo: ${p.ativo}<br><br>
 
-          <button onclick="excluirProduto('${id}')" style="background:red;">
-            Excluir
-          </button>
-        </div>
-      `;
-    });
+        <button onclick="ativarProduto('${id}', ${!p.ativo})">
+          ${p.ativo ? "Desativar" : "Ativar"}
+        </button>
+
+        <button onclick="excluirProduto('${id}')" style="background:red">
+          Excluir
+        </button>
+      </div>
+    `;
   });
-}
+});
 
-function ativarProduto(id, status) {
-  db.collection("produtos").doc(id).update({
-    ativo: status
-  });
+function ativarProduto(id, estado) {
+  db.collection("produtos").doc(id).update({ ativo: estado });
 }
 
 function excluirProduto(id) {
@@ -162,7 +124,6 @@ function excluirProduto(id) {
   }
 }
 </script>
-
 
 </body>
 </html>
