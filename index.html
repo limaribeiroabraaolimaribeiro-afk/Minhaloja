@@ -106,6 +106,29 @@ function produtoHTML(nome, imagem, idQtd, idHora) {
 
 <div id="produtos"></div>
 
+<script type="module">
+import { db, collection, onSnapshot, query, orderBy } from "./firebase.js";
+
+const lista = document.getElementById("produtos");
+const q = query(collection(db, "produtos"), orderBy("ordem"));
+
+onSnapshot(q, snap => {
+  lista.innerHTML = "";
+  snap.forEach(d => {
+    const p = d.data();
+    if (!p.ativo) return;
+
+    lista.innerHTML += `
+      <div>
+        <img src="${p.imagem}" width="120">
+        <h3>${p.nome}</h3>
+        <p>R$ ${p.preco}</p>
+      </div>
+    `;
+  });
+});
+</script>
+
 <div class="produto">
 <h2>💳 Formas de Pagamento</h2>
 <p><strong>Pix:</strong> 13965602977</p>
