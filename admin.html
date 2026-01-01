@@ -1,57 +1,56 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
-  <title>Login Admin</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<title>Painel Admin</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-
-  <style>
-    body {
-      font-family: Arial;
-      background: #111;
-      color: #fff;
-      display: flex;
-      height: 100vh;
-      justify-content: center;
-      align-items: center;
-    }
-    .box {
-      background: #1c1c1c;
-      padding: 30px;
-      border-radius: 10px;
-      width: 100%;
-      max-width: 350px;
-    }
-    input, button {
-      width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-    }
-    button {
-      background: #25D366;
-      border: none;
-      color: #fff;
-      font-size: 16px;
-      cursor: pointer;
-    }
-  </style>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #111;
+  color: #fff;
+  padding: 20px;
+}
+h1 {
+  color: #25D366;
+}
+input, button {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+  border: none;
+}
+button {
+  background: #25D366;
+  color: #000;
+  font-weight: bold;
+}
+</style>
 </head>
+
 <body>
 
-<div class="box">
-  <h2>Login Admin</h2>
-  <input type="email" id="email" placeholder="Email">
-  <input type="password" id="senha" placeholder="Senha">
-  <button onclick="login()">Entrar</button>
-</div>
+<h1>🛠 Painel Admin</h1>
 
-<script>
-  // 🔥 COLE AQUI O SDK DO FIREBASE
- const firebaseConfig = {
+<input id="nome" placeholder="Nome do produto">
+<input id="preco" type="number" placeholder="Preço">
+<input id="imagem" placeholder="Caminho da imagem (ex: imagens/foto.jpg)">
+<input id="ordem" type="number" placeholder="Ordem (1,2,3...)">
+
+<button onclick="salvarProduto()">Salvar Produto</button>
+
+<p id="status"></p>
+
+<!-- FIREBASE -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+// 🔴 COLE SEU firebaseConfig AQUI
+const firebaseConfig = {
   apiKey: "AIzaSyCy-zUh5M2KiXvWGfXL17onsOtpzGZXf8Y",
   authDomain: "chiquinho-admin-248b6.firebaseapp.com",
   projectId: "chiquinho-admin-248b6",
@@ -60,21 +59,42 @@
   appId: "1:177897723264:web:f59f2f0e0f456c9bbd5d65"
 };
 
-  firebase.initializeApp(firebaseConfig);
-  const auth = firebase.auth();
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const auth = getAuth(app);
 
-  function login() {
-    const email = document.getElementById("email").value;
-    const senha = document.getElementById("senha").value;
-
-    auth.signInWithEmailAndPassword(email, senha)
-      .then(() => {
-        window.location.href = "painel.html";
-      })
-      .catch(error => {
-        alert("Erro: " + error.message);
-      });
+// 🔒 Proteção: só entra logado
+onAuthStateChanged(auth, user => {
+  if (!user) {
+    window.location.href = "login.html";
   }
+});
+
+window.salvarProduto = async function () {
+  const nome = document.getElementById("nome").value;
+  const preco = Number(document.getElementById("preco").value);
+  const imagem = document.getElementById("imagem").value;
+  const ordem = Number(document.getElementById("ordem").value);
+
+  if (!nome || !preco || !imagem) {
+    alert("Preencha tudo");
+    return;
+  }
+
+  await addDoc(collection(db, "produtos"), {
+    nome,
+    preco,
+    imagem,
+    ativo: true,
+    ordem
+  });
+
+  document.getElementById("status").innerText = "✅ Produto salvo!";
+  document.getElementById("nome").value = "";
+  document.getElementById("preco").value = "";
+  document.getElementById("imagem").value = "";
+  document.getElementById("ordem").value = "";
+}
 </script>
 
 </body>
