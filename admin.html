@@ -79,24 +79,45 @@ function adicionarProduto() {
   });
 }
 
+<script>
 function listarProdutos() {
   document.getElementById("lista").innerHTML = "";
   db.collection("produtos").onSnapshot(snapshot => {
     snapshot.forEach(doc => {
       const p = doc.data();
+      const id = doc.id;
+
       document.getElementById("lista").innerHTML += `
         <div class="produto">
           <strong>${p.nome}</strong><br>
           R$ ${p.preco}<br>
-          Ativo: ${p.ativo}
+
+          <button onclick="ativarProduto('${id}', ${!p.ativo})">
+            ${p.ativo ? 'Desativar' : 'Ativar'}
+          </button>
+
+          <button onclick="excluirProduto('${id}')" style="background:red;">
+            Excluir
+          </button>
         </div>
       `;
     });
   });
 }
 
-listarProdutos();
+function ativarProduto(id, status) {
+  db.collection("produtos").doc(id).update({
+    ativo: status
+  });
+}
+
+function excluirProduto(id) {
+  if (confirm("Excluir produto?")) {
+    db.collection("produtos").doc(id).delete();
+  }
+}
 </script>
+
 
 </body>
 </html>
