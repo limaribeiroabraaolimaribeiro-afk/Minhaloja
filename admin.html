@@ -8,36 +8,41 @@
 <style>
 body {
   font-family: Arial, sans-serif;
-  background:#f2f2f2;
+  background:#f4f4f4;
   padding:15px;
+}
+h2 {
+  text-align:center;
 }
 .card {
   background:#fff;
-  padding:15px;
-  border-radius:10px;
-  margin-bottom:15px;
+  padding:16px;
+  border-radius:12px;
+  margin-bottom:16px;
 }
 input, button {
   width:100%;
-  padding:10px;
+  padding:12px;
   margin-top:8px;
+  font-size:15px;
 }
 button {
   background:#4CAF50;
   color:#fff;
   border:none;
-  font-size:16px;
-}
-img {
-  width:120px;
   border-radius:8px;
+}
+button.sec {
+  background:#2196F3;
+}
+.produto img {
+  width:100%;
+  max-width:140px;
+  border-radius:10px;
 }
 .ativo { color:green }
 .inativo { color:red }
 </style>
-
-<!-- Cloudinary Upload Widget -->
-<script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
 </head>
 
 <body>
@@ -50,81 +55,67 @@ img {
   <input id="nome" placeholder="Nome do produto">
   <input id="preco" type="number" placeholder="Preço">
 
-  <!-- Guarda a URL automaticamente -->
-  <input id="imagem" placeholder="Imagem enviada" readonly>
+  <button class="sec" onclick="abrirUpload()">📷 Enviar imagem</button>
+  <input id="imagem" type="hidden">
 
-  <button id="btnUpload">📤 Enviar imagem</button>
-  <button id="btnAdd">➕ Adicionar Produto</button>
+  <button onclick="adicionar()">➕ Adicionar Produto</button>
 </div>
 
 <div id="lista"></div>
 
+<!-- Cloudinary Widget -->
+<script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
+
 <script type="module">
 import { db, auth } from "./firebase.js";
-
 import {
-  collection,
-  addDoc,
-  onSnapshot,
-  deleteDoc,
-  doc,
-  updateDoc,
-  query,
-  orderBy
+  collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, query, orderBy
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-import {
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-/* 🔐 Proteção */
 onAuthStateChanged(auth, user => {
-  if (!user) window.location.href = "login.html";
+  if (!user) location.href = "login.html";
 });
 
-/* 📌 Elementos */
-const nome = document.getElementById("nome");
-const preco = document.getElementById("preco");
-const imagem = document.getElementById("imagem");
 const lista = document.getElementById("lista");
 
-/* ☁️ Cloudinary Upload */
-const widget = cloudinary.createUploadWidget({
+const uploadWidget = cloudinary.createUploadWidget({
   cloudName: "dhbuwhdwe",
-  folder: "produtos",
-  cropping: false
+  uploadPreset: "produtos_site"
 }, (error, result) => {
   if (!error && result && result.event === "success") {
-    imagem.value = result.info.secure_url;
-    alert("✅ Imagem enviada com sucesso!");
+    document.getElementById("imagem").value = result.info.secure_url;
+    alert("Imagem enviada com sucesso!");
   }
 });
 
-document.getElementById("btnUpload").onclick = () => widget.open();
+window.abrirUpload = () => uploadWidget.open();
 
-/* ➕ Adicionar produto */
-document.getElementById("btnAdd").onclick = async () => {
-  if (!nome.value || !preco.value || !imagem.value) {
+window.adicionar = async () => {
+  const nome = document.getElementById("nome").value;
+  const preco = document.getElementById("preco").value;
+  const imagem = document.getElementById("imagem").value;
+
+  if (!nome || !preco || !imagem) {
     alert("Preencha tudo e envie a imagem");
     return;
   }
 
   await addDoc(collection(db, "produtos"), {
-    nome: nome.value,
-    preco: Number(preco.value),
-    imagem: imagem.value,
+    nome,
+    preco: Number(preco),
+    imagem,
     ativo: true,
     ordem: Date.now()
   });
 
-  nome.value = "";
-  preco.value = "";
-  imagem.value = "";
+  document.getElementById("nome").value = "";
+  document.getElementById("preco").value = "";
+  document.getElementById("imagem").value = "";
 
-  alert("✅ Produto cadastrado!");
+  alert("Produto adicionado!");
 };
 
-/* 📦 Listagem */
 const q = query(collection(db, "produtos"), orderBy("ordem", "desc"));
 
 onSnapshot(q, snap => {
@@ -132,7 +123,7 @@ onSnapshot(q, snap => {
   snap.forEach(d => {
     const p = d.data();
     lista.innerHTML += `
-      <div class="card">
+      <div class="card produto">
         <img src="${p.imagem}">
         <strong>${p.nome}</strong><br>
         💰 R$ ${p.preco}<br>
@@ -143,7 +134,6 @@ onSnapshot(q, snap => {
         <button onclick="toggle('${d.id}', ${!p.ativo})">
           ${p.ativo ? 'Desativar' : 'Ativar'}
         </button>
-
         <button style="background:red" onclick="del('${d.id}')">
           Excluir
         </button>
@@ -152,7 +142,6 @@ onSnapshot(q, snap => {
   });
 });
 
-/* 🔁 Ações */
 window.toggle = async (id, estado) => {
   await updateDoc(doc(db, "produtos", id), { ativo: estado });
 };
