@@ -10,167 +10,187 @@
 
 <style>
 body {
+  margin: 0;
   font-family: Arial, sans-serif;
-  background:#f4f6f8;
-  padding:20px;
+  background: #f4f6f8;
 }
 
-h1 {
-  text-align:center;
-  margin-bottom:20px;
+header {
+  background: #22b8a0;
+  color: white;
+  padding: 18px;
+  font-size: 20px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.container {
+  padding: 15px;
 }
 
 .card {
-  background:#fff;
-  border-radius:12px;
-  padding:20px;
-  margin-bottom:20px;
-  box-shadow:0 4px 10px rgba(0,0,0,.08);
+  background: white;
+  border-radius: 14px;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
 }
 
-input, button {
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  border-radius:8px;
-  border:1px solid #ddd;
-  font-size:15px;
+input {
+  width: 100%;
+  padding: 12px;
+  margin-top: 8px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
 }
 
 button {
-  background:#4CAF50;
-  color:#fff;
-  border:none;
-  cursor:pointer;
+  width: 100%;
+  padding: 14px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
 }
 
-button.sec {
-  background:#555;
+.btn {
+  background: #22b8a0;
+  color: white;
 }
 
-button.del {
-  background:#e53935;
+.btn-sec {
+  background: #ddd;
 }
 
 .produto {
-  display:flex;
-  gap:15px;
-  align-items:center;
+  display: flex;
+  gap: 12px;
 }
 
 .produto img {
-  width:90px;
-  border-radius:8px;
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 10px;
 }
 
-.info {
-  flex:1;
+.produto-info {
+  flex: 1;
 }
 
 .status {
-  font-weight:bold;
+  font-size: 13px;
+  margin-top: 4px;
 }
 
-.ativo { color:green }
-.inativo { color:red }
+.ativo { color: green; }
+.inativo { color: red; }
 </style>
 </head>
 
 <body>
 
-<h1>📦 Painel de Produtos</h1>
+<header>📦 Painel de Produtos</header>
+
+<div class="container">
 
 <div class="card">
   <h3>Novo Produto</h3>
 
   <input id="nome" placeholder="Nome do produto">
-  <input id="preco" type="number" placeholder="Preço">
+  <input id="preco" type="number" placeholder="Preço (ex: 15)">
 
-  <button id="uploadBtn" class="sec">📷 Enviar imagem</button>
+  <button class="btn-sec" onclick="uploadImagem()">📷 Enviar imagem</button>
+  <input id="imagem" placeholder="URL da imagem" readonly>
 
-  <input id="imagem" placeholder="Imagem enviada" disabled>
-
-  <button id="addBtn">➕ Adicionar Produto</button>
+  <button class="btn" onclick="adicionarProduto()">➕ Adicionar Produto</button>
 </div>
 
 <div id="lista"></div>
+
+</div>
 
 <script type="module">
 import { db, auth } from "./firebase.js";
 import {
   collection, addDoc, onSnapshot,
-  deleteDoc, updateDoc, doc, query, orderBy
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  deleteDoc, doc, updateDoc,
+  query, orderBy
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 import {
   onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 
 // 🔐 Proteção
 onAuthStateChanged(auth, user => {
   if (!user) location.href = "login.html";
 });
 
-const nome = document.getElementById("nome");
-const preco = document.getElementById("preco");
-const imagem = document.getElementById("imagem");
-const lista = document.getElementById("lista");
+// 📷 Upload Cloudinary
+window.uploadImagem = () => {
+  cloudinary.openUploadWidget({
+    cloudName: "dhbuwhdwe",
+    uploadPreset: "produtos_site",
+    folder: "produtos",
+    sources: ["local", "camera"],
+    language: "pt"
+  }, (error, result) => {
+    if (!error && result.event === "success") {
+      document.getElementById("imagem").value = result.info.secure_url;
+    }
+  });
+};
 
-// 📷 Cloudinary Upload
-const widget = cloudinary.createUploadWidget({
-  cloudName: "dhbuwhdwe",
-  uploadPreset: "produtos_site"
-}, (error, result) => {
-  if (!error && result.event === "success") {
-    imagem.value = result.info.secure_url;
-  }
-});
+// ➕ Adicionar produto
+window.adicionarProduto = async () => {
+  const nome = nome.value;
+  const preco = preco.value;
+  const imagem = imagem.value;
 
-document.getElementById("uploadBtn").onclick = () => widget.open();
-
-// ➕ Adicionar
-document.getElementById("addBtn").onclick = async () => {
-  if (!nome.value || !preco.value || !imagem.value) {
+  if (!nome || !preco || !imagem) {
     alert("Preencha todos os campos");
     return;
   }
 
   await addDoc(collection(db, "produtos"), {
-    nome: nome.value,
-    preco: Number(preco.value),
-    imagem: imagem.value,
+    nome,
+    preco: Number(preco),
+    imagem,
     ativo: true,
     ordem: Date.now()
   });
 
-  nome.value = preco.value = imagem.value = "";
+  nome.value = "";
+  preco.value = "";
+  imagem.value = "";
 };
 
-// 📦 Listagem automática
+// 📦 Listar produtos
+const lista = document.getElementById("lista");
 const q = query(collection(db, "produtos"), orderBy("ordem", "desc"));
 
 onSnapshot(q, snap => {
   lista.innerHTML = "";
-
   snap.forEach(d => {
     const p = d.data();
     lista.innerHTML += `
       <div class="card produto">
         <img src="${p.imagem}">
-        <div class="info">
+        <div class="produto-info">
           <strong>${p.nome}</strong><br>
-          💰 R$ ${p.preco}<br>
-          <span class="status ${p.ativo ? 'ativo':'inativo'}">
+          💰 R$ ${p.preco}
+          <div class="status ${p.ativo ? 'ativo' : 'inativo'}">
             ${p.ativo ? 'Ativo' : 'Inativo'}
-          </span>
-        </div>
-        <div>
-          <button class="sec"
-            onclick="toggle('${d.id}', ${!p.ativo})">
-            ${p.ativo ? 'Desativar':'Ativar'}
+          </div>
+
+          <button onclick="toggle('${d.id}', ${!p.ativo})">
+            ${p.ativo ? 'Desativar' : 'Ativar'}
           </button>
-          <button class="del"
-            onclick="del('${d.id}')">
+
+          <button style="background:#e03131;color:white"
+            onclick="excluir('${d.id}')">
             Excluir
           </button>
         </div>
@@ -179,13 +199,12 @@ onSnapshot(q, snap => {
   });
 });
 
-window.toggle = async (id, estado) => {
-  await updateDoc(doc(db,"produtos",id),{ativo:estado});
-};
+window.toggle = async (id, estado) =>
+  updateDoc(doc(db, "produtos", id), { ativo: estado });
 
-window.del = async id => {
+window.excluir = async id => {
   if (confirm("Excluir produto?"))
-    await deleteDoc(doc(db,"produtos",id));
+    await deleteDoc(doc(db, "produtos", id));
 };
 </script>
 
