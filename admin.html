@@ -1,14 +1,31 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-br">
 <head>
 <meta charset="UTF-8">
 <title>Painel Admin</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <style>
-body { font-family: Arial; background:#f2f2f2; padding:15px }
-.card { background:#fff; padding:15px; border-radius:10px; margin-bottom:15px }
-img { width:100px; border-radius:8px }
-button { padding:8px; margin-top:5px }
+body {
+  font-family: Arial, sans-serif;
+  background:#f2f2f2;
+  padding:15px;
+}
+.card {
+  background:#fff;
+  padding:15px;
+  border-radius:10px;
+  margin-bottom:15px;
+}
+img {
+  width:100px;
+  border-radius:8px;
+}
+button {
+  padding:8px;
+  margin-top:5px;
+  width:100%;
+}
 .ativo { color:green }
 .inativo { color:red }
 </style>
@@ -19,11 +36,11 @@ button { padding:8px; margin-top:5px }
 <h2>📦 Painel de Produtos</h2>
 
 <div class="card">
-<h3>Novo Produto</h3>
-<input id="nome" placeholder="Nome"><br>
-<input id="preco" type="number" placeholder="Preço"><br>
-<input id="imagem" placeholder="URL da imagem"><br>
-<button onclick="add()">➕ Adicionar</button>
+  <h3>Novo Produto</h3>
+  <input id="nome" placeholder="Nome do produto"><br><br>
+  <input id="preco" type="number" placeholder="Preço"><br><br>
+  <input id="imagem" placeholder="URL da imagem (Cloudinary)"><br><br>
+  <button id="btnAdd">➕ Adicionar Produto</button>
 </div>
 
 <div id="lista"></div>
@@ -43,51 +60,83 @@ import {
   orderBy
 } from "./firebase.js";
 
+/* 🔐 Proteção por login */
 onAuthStateChanged(auth, user => {
-  if (!user) window.location.href = "login.html";
+  if (!user) {
+    window.location.href = "login.html";
+  }
 });
 
+/* 📦 Referências */
 const lista = document.getElementById("lista");
-const q = query(collection(db, "produtos"), orderBy("ordem"));
+const nomeInput = document.getElementById("nome");
+const precoInput = document.getElementById("preco");
+const imagemInput = document.getElementById("imagem");
+const btnAdd = document.getElementById("btnAdd");
 
-onSnapshot(q, snap => {
+/* 🔄 Listar produtos */
+const q = query(collection(db, "produtos"), orderBy("ordem", "desc"));
+
+onSnapshot(q, snapshot => {
   lista.innerHTML = "";
-  snap.forEach(d => {
-    const p = d.data();
+  snapshot.forEach(docSnap => {
+    const p = docSnap.data();
+    const id = docSnap.id;
+
     lista.innerHTML += `
       <div class="card">
-        <img src="${p.imagem}"><br>
+        <img src="${p.imagem}" onerror="this.style.display='none'"><br><br>
         <strong>${p.nome}</strong><br>
-        R$ ${p.preco}<br>
+        💰 R$ ${p.preco}<br>
         <span class="${p.ativo ? 'ativo' : 'inativo'}">
           ${p.ativo ? 'Ativo' : 'Inativo'}
-        </span><br>
-        <button onclick="toggle('${d.id}', ${!p.ativo})">
+        </span><br><br>
+
+        <button onclick="toggle('${id}', ${!p.ativo})">
           ${p.ativo ? 'Desativar' : 'Ativar'}
         </button>
-        <button onclick="del('${d.id}')">Excluir</button>
+        <button onclick="del('${id}')">🗑 Excluir</button>
       </div>
     `;
   });
 });
 
-window.add = async () => {
+/* ➕ Adicionar produto */
+btnAdd.addEventListener("click", async () => {
+  const nome = nomeInput.value.trim();
+  const preco = Number(precoInput.value);
+  const imagem = imagemInput.value.trim();
+
+  if (!nome || !preco || !imagem) {
+    alert("Preencha todos os campos");
+    return;
+  }
+
   await addDoc(collection(db, "produtos"), {
-    nome: nome.value,
-    preco: Number(preco.value),
-    imagem: imagem.value,
+    nome,
+    preco,
+    imagem,
     ativo: true,
     ordem: Date.now()
   });
-};
 
+  nomeInput.value = "";
+  precoInput.value = "";
+  imagemInput.value = "";
+});
+
+/* 🗑 Excluir */
 window.del = async id => {
-  if (confirm("Excluir?"))
+  if (confirm("Excluir produto?")) {
     await deleteDoc(doc(db, "produtos", id));
+  }
 };
 
+/* 🔁 Ativar / Desativar */
 window.toggle = async (id, estado) => {
-  await updateDoc(doc(db, "produtos", id), { ativo: estado });
+  await updateDoc(doc(db, "produtos", id), {
+    ativo: estado
+  });
 };
 </script>
 
