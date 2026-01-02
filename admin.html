@@ -2,141 +2,173 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Painel Admin</title>
+<title>Painel Administrativo</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 body {
-  font-family: Arial, sans-serif;
-  background:#f4f4f4;
-  padding:15px;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: #f4f6f8;
+  margin: 0;
+  padding: 20px;
 }
-h2 {
-  text-align:center;
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
 }
+
+.container {
+  max-width: 900px;
+  margin: auto;
+}
+
 .card {
-  background:#fff;
-  padding:16px;
-  border-radius:12px;
-  margin-bottom:16px;
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.08);
 }
+
 input, button {
-  width:100%;
-  padding:12px;
-  margin-top:8px;
-  font-size:15px;
+  width: 100%;
+  padding: 12px;
+  margin-top: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 15px;
 }
+
 button {
-  background:#4CAF50;
-  color:#fff;
-  border:none;
-  border-radius:8px;
+  background: #4CAF50;
+  color: #fff;
+  border: none;
+  cursor: pointer;
 }
-button.sec {
-  background:#2196F3;
+
+button:hover {
+  opacity: 0.9;
 }
+
+.produto {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
 .produto img {
-  width:100%;
-  max-width:140px;
-  border-radius:10px;
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+  border-radius: 10px;
 }
-.ativo { color:green }
-.inativo { color:red }
+
+.produto-info {
+  flex: 1;
+}
+
+.status {
+  font-weight: bold;
+}
+
+.ativo { color: green; }
+.inativo { color: red; }
+
+.acoes button {
+  margin-top: 5px;
+}
 </style>
 </head>
 
 <body>
 
-<h2>📦 Painel de Produtos</h2>
+<h1>📦 Painel de Produtos</h1>
 
-<div class="card">
-  <h3>Novo Produto</h3>
+<div class="container">
 
-  <input id="nome" placeholder="Nome do produto">
-  <input id="preco" type="number" placeholder="Preço">
+  <div class="card">
+    <h3>➕ Novo Produto</h3>
+    <input id="nome" placeholder="Nome do produto">
+    <input id="preco" type="number" placeholder="Preço (ex: 15)">
+    <input id="imagem" placeholder="URL da imagem (Cloudinary)">
+    <button id="btnAdd">Adicionar Produto</button>
+  </div>
 
-  <button class="sec" onclick="abrirUpload()">📷 Enviar imagem</button>
-  <input id="imagem" type="hidden">
+  <div id="lista"></div>
 
-  <button onclick="adicionar()">➕ Adicionar Produto</button>
 </div>
-
-<div id="lista"></div>
-
-<!-- Cloudinary Widget -->
-<script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
 
 <script type="module">
 import { db, auth } from "./firebase.js";
 import {
-  collection, addDoc, onSnapshot, deleteDoc, doc, updateDoc, query, orderBy
+  collection,
+  addDoc,
+  onSnapshot,
+  deleteDoc,
+  doc,
+  updateDoc,
+  query,
+  orderBy
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import {
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 onAuthStateChanged(auth, user => {
   if (!user) location.href = "login.html";
 });
 
+const nome = document.getElementById("nome");
+const preco = document.getElementById("preco");
+const imagem = document.getElementById("imagem");
 const lista = document.getElementById("lista");
 
-const uploadWidget = cloudinary.createUploadWidget({
-  cloudName: "dhbuwhdwe",
-  uploadPreset: "produtos_site"
-}, (error, result) => {
-  if (!error && result && result.event === "success") {
-    document.getElementById("imagem").value = result.info.secure_url;
-    alert("Imagem enviada com sucesso!");
-  }
-});
-
-window.abrirUpload = () => uploadWidget.open();
-
-window.adicionar = async () => {
-  const nome = document.getElementById("nome").value;
-  const preco = document.getElementById("preco").value;
-  const imagem = document.getElementById("imagem").value;
-
-  if (!nome || !preco || !imagem) {
-    alert("Preencha tudo e envie a imagem");
+document.getElementById("btnAdd").onclick = async () => {
+  if (!nome.value || !preco.value || !imagem.value) {
+    alert("Preencha todos os campos.");
     return;
   }
 
   await addDoc(collection(db, "produtos"), {
-    nome,
-    preco: Number(preco),
-    imagem,
+    nome: nome.value,
+    preco: Number(preco.value),
+    imagem: imagem.value,
     ativo: true,
     ordem: Date.now()
   });
 
-  document.getElementById("nome").value = "";
-  document.getElementById("preco").value = "";
-  document.getElementById("imagem").value = "";
-
-  alert("Produto adicionado!");
+  nome.value = "";
+  preco.value = "";
+  imagem.value = "";
 };
 
 const q = query(collection(db, "produtos"), orderBy("ordem", "desc"));
 
 onSnapshot(q, snap => {
   lista.innerHTML = "";
+
   snap.forEach(d => {
     const p = d.data();
     lista.innerHTML += `
       <div class="card produto">
         <img src="${p.imagem}">
-        <strong>${p.nome}</strong><br>
-        💰 R$ ${p.preco}<br>
-        <span class="${p.ativo ? 'ativo' : 'inativo'}">
-          ${p.ativo ? 'Ativo' : 'Inativo'}
-        </span><br><br>
-
-        <button onclick="toggle('${d.id}', ${!p.ativo})">
-          ${p.ativo ? 'Desativar' : 'Ativar'}
-        </button>
-        <button style="background:red" onclick="del('${d.id}')">
-          Excluir
-        </button>
+        <div class="produto-info">
+          <strong>${p.nome}</strong><br>
+          💰 R$ ${p.preco}<br>
+          <span class="status ${p.ativo ? 'ativo' : 'inativo'}">
+            ${p.ativo ? 'Ativo' : 'Inativo'}
+          </span>
+        </div>
+        <div class="acoes">
+          <button onclick="toggle('${d.id}', ${!p.ativo})">
+            ${p.ativo ? 'Desativar' : 'Ativar'}
+          </button>
+          <button style="background:#e53935" onclick="del('${d.id}')">
+            Excluir
+          </button>
+        </div>
       </div>
     `;
   });
@@ -146,9 +178,10 @@ window.toggle = async (id, estado) => {
   await updateDoc(doc(db, "produtos", id), { ativo: estado });
 };
 
-window.del = async id => {
-  if (confirm("Excluir produto?"))
+window.del = async (id) => {
+  if (confirm("Deseja excluir este produto?")) {
     await deleteDoc(doc(db, "produtos", id));
+  }
 };
 </script>
 
