@@ -35,6 +35,9 @@ img {
 .ativo { color:green }
 .inativo { color:red }
 </style>
+
+<!-- Cloudinary Upload Widget -->
+<script src="https://widget.cloudinary.com/v2.0/global/all.js"></script>
 </head>
 
 <body>
@@ -46,18 +49,18 @@ img {
 
   <input id="nome" placeholder="Nome do produto">
   <input id="preco" type="number" placeholder="Preço">
-  <input id="imagem" placeholder="URL da imagem (Cloudinary)">
-  
+
+  <!-- Guarda a URL automaticamente -->
+  <input id="imagem" placeholder="Imagem enviada" readonly>
+
+  <button id="btnUpload">📤 Enviar imagem</button>
   <button id="btnAdd">➕ Adicionar Produto</button>
 </div>
 
 <div id="lista"></div>
 
 <script type="module">
-import {
-  db,
-  auth
-} from "./firebase.js";
+import { db, auth } from "./firebase.js";
 
 import {
   collection,
@@ -74,57 +77,60 @@ import {
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-// 🔐 Proteção de login
+/* 🔐 Proteção */
 onAuthStateChanged(auth, user => {
-  if (!user) {
-    window.location.href = "login.html";
-  }
+  if (!user) window.location.href = "login.html";
 });
 
-// 📌 Elementos
-const nomeInput = document.getElementById("nome");
-const precoInput = document.getElementById("preco");
-const imagemInput = document.getElementById("imagem");
+/* 📌 Elementos */
+const nome = document.getElementById("nome");
+const preco = document.getElementById("preco");
+const imagem = document.getElementById("imagem");
 const lista = document.getElementById("lista");
-const btnAdd = document.getElementById("btnAdd");
 
-// ➕ Adicionar produto
-btnAdd.addEventListener("click", async () => {
-  try {
-    if (!nomeInput.value || !precoInput.value || !imagemInput.value) {
-      alert("Preencha todos os campos");
-      return;
-    }
-
-    await addDoc(collection(db, "produtos"), {
-      nome: nomeInput.value,
-      preco: Number(precoInput.value),
-      imagem: imagemInput.value,
-      ativo: true,
-      ordem: Date.now()
-    });
-
-    nomeInput.value = "";
-    precoInput.value = "";
-    imagemInput.value = "";
-
-    alert("✅ Produto adicionado com sucesso!");
-  } catch (err) {
-    console.error(err);
-    alert("❌ Erro ao adicionar produto");
+/* ☁️ Cloudinary Upload */
+const widget = cloudinary.createUploadWidget({
+  cloudName: "dhbuwhdwe",
+  folder: "produtos",
+  cropping: false
+}, (error, result) => {
+  if (!error && result && result.event === "success") {
+    imagem.value = result.info.secure_url;
+    alert("✅ Imagem enviada com sucesso!");
   }
 });
 
-// 📦 Listar produtos em tempo real
+document.getElementById("btnUpload").onclick = () => widget.open();
+
+/* ➕ Adicionar produto */
+document.getElementById("btnAdd").onclick = async () => {
+  if (!nome.value || !preco.value || !imagem.value) {
+    alert("Preencha tudo e envie a imagem");
+    return;
+  }
+
+  await addDoc(collection(db, "produtos"), {
+    nome: nome.value,
+    preco: Number(preco.value),
+    imagem: imagem.value,
+    ativo: true,
+    ordem: Date.now()
+  });
+
+  nome.value = "";
+  preco.value = "";
+  imagem.value = "";
+
+  alert("✅ Produto cadastrado!");
+};
+
+/* 📦 Listagem */
 const q = query(collection(db, "produtos"), orderBy("ordem", "desc"));
 
-onSnapshot(q, snapshot => {
+onSnapshot(q, snap => {
   lista.innerHTML = "";
-
-  snapshot.forEach(docSnap => {
-    const p = docSnap.data();
-    const id = docSnap.id;
-
+  snap.forEach(d => {
+    const p = d.data();
     lista.innerHTML += `
       <div class="card">
         <img src="${p.imagem}">
@@ -134,11 +140,11 @@ onSnapshot(q, snapshot => {
           ${p.ativo ? 'Ativo' : 'Inativo'}
         </span><br><br>
 
-        <button onclick="toggle('${id}', ${!p.ativo})">
+        <button onclick="toggle('${d.id}', ${!p.ativo})">
           ${p.ativo ? 'Desativar' : 'Ativar'}
         </button>
 
-        <button style="background:red" onclick="del('${id}')">
+        <button style="background:red" onclick="del('${d.id}')">
           Excluir
         </button>
       </div>
@@ -146,16 +152,14 @@ onSnapshot(q, snapshot => {
   });
 });
 
-// 🔁 Ativar / desativar
+/* 🔁 Ações */
 window.toggle = async (id, estado) => {
   await updateDoc(doc(db, "produtos", id), { ativo: estado });
 };
 
-// 🗑 Excluir
-window.del = async (id) => {
-  if (confirm("Excluir produto?")) {
+window.del = async id => {
+  if (confirm("Excluir produto?"))
     await deleteDoc(doc(db, "produtos", id));
-  }
 };
 </script>
 
