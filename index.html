@@ -2,16 +2,13 @@
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
-<title>Chiquinho dos Doces</title>
+<title>🍨 Chiquinho dos Doces</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<link rel="manifest" href="manifest.json">
-<meta name="theme-color" content="#4a2c2a">
 
 <style>
 body {
   font-family: Arial, sans-serif;
-  background: #f2f2f2;
+  background: #f6f6f6;
   padding: 20px;
 }
 
@@ -22,27 +19,28 @@ h1 {
 
 .subtitulo {
   text-align: center;
-  color: #666;
+  color: #777;
   margin-bottom: 25px;
 }
 
 .produto {
   background: #fff;
-  padding: 20px;
+  border-radius: 14px;
+  padding: 16px;
   margin-bottom: 20px;
-  border-radius: 12px;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  box-shadow: 0 6px 15px rgba(0,0,0,0.08);
 }
 
 .produto img {
   width: 100%;
-  border-radius: 10px;
-  margin-bottom: 10px;
+  border-radius: 12px;
+  margin-bottom: 12px;
 }
 
 .preco {
-  font-weight: bold;
   color: #1b8f3a;
+  font-weight: bold;
+  font-size: 18px;
 }
 
 .botao {
@@ -51,7 +49,7 @@ h1 {
   background: #25D366;
   color: white;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   font-size: 16px;
   margin-top: 10px;
 }
@@ -61,58 +59,47 @@ h1 {
 <body>
 
 <h1>🍨 Chiquinho dos Doces</h1>
-<p class="subtitulo">Mousses artesanais • Encomendas pelo WhatsApp</p>
+<p class="subtitulo">Mousses artesanais • Todos por R$ 15,00</p>
 
 <div id="produtos"></div>
 
-<div class="produto">
-  <h2>💳 Formas de Pagamento</h2>
-  <p><strong>Pix:</strong> 13965602977</p>
-  <p>Envie o comprovante pelo WhatsApp após o pagamento.</p>
-</div>
-
-<button class="botao" onclick="confirmarPagamento()">
-✅ Já paguei – confirmar pedido
-</button>
-
-<!-- 🔥 FIREBASE + FIRESTORE -->
+<!-- 🔥 Firebase -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, query, where, orderBy, onSnapshot } 
-from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCy-zUh5M2KiXvWGfXL17onsOtpzGZXf8Y",
-  authDomain: "chiquinho-admin-248b6.firebaseapp.com",
-  projectId: "chiquinho-admin-248b6",
-  storageBucket: "chiquinho-admin-248b6.firebasestorage.app",
-  messagingSenderId: "177897723264",
-  appId: "1:177897723264:web:f59f2f0e0f456c9bbd5d65"
+  apiKey: "SUA_API_KEY",
+  authDomain: "SEU_AUTH_DOMAIN",
+  projectId: "SEU_PROJECT_ID",
+  storageBucket: "SEU_STORAGE",
+  messagingSenderId: "SEU_SENDER_ID",
+  appId: "SEU_APP_ID"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const container = document.getElementById("produtos");
+const lista = document.getElementById("produtos");
 
 const q = query(
   collection(db, "produtos"),
-  where("ativo", "==", true),
-  orderBy("ordem")
+  orderBy("ordem", "desc")
 );
 
-// 🔄 Atualiza produtos automaticamente
 onSnapshot(q, snapshot => {
-  container.innerHTML = "";
+  lista.innerHTML = "";
 
   snapshot.forEach(doc => {
     const p = doc.data();
+    if (!p.ativo) return;
 
-    container.innerHTML += `
+    lista.innerHTML += `
       <div class="produto">
         <img src="${p.imagem}">
         <h2>${p.nome}</h2>
         <p class="preco">R$ ${p.preco}</p>
+
         <button class="botao"
           onclick="comprar('${p.nome}', ${p.preco})">
           Comprar pelo WhatsApp
@@ -121,38 +108,18 @@ onSnapshot(q, snapshot => {
     `;
   });
 });
-</script>
 
-<script>
-function comprar(produto, preco) {
+window.comprar = (nome, preco) => {
   const msg =
-    Olá! Quero fazer um pedido:\n\n +
-    🍮 Produto: ${produto}\n +
-    💰 Valor: R$ ${preco}\n\n +
-    Aguardo instruções 😊;
+    `Olá! Quero fazer um pedido:\n\n` +
+    `🍮 Produto: ${nome}\n` +
+    `💰 Preço: R$ ${preco}`;
 
   window.open(
     "https://wa.me/5547992101675?text=" + encodeURIComponent(msg),
     "_blank"
   );
-}
-
-function confirmarPagamento() {
-  const msg =
-    "Olá! Já realizei o pagamento do meu pedido ✅\n\n" +
-    "Estou enviando o comprovante agora.";
-
-  window.open(
-    "https://wa.me/5547992101675?text=" + encodeURIComponent(msg),
-    "_blank"
-  );
-}
-</script>
-
-<script>
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js");
-}
+};
 </script>
 
 </body>
